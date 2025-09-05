@@ -150,7 +150,8 @@ export function ContactModal({
       onClose();
     } catch (error) {
       console.error('Error submitting form:', error);
-      toast.error(isEs ? 'Lo sentimos, hubo un error al enviar tu mensaje. Inténtalo de nuevo.' : 'Sorry, there was an error sending your message. Please try again.');
+      const msg = error instanceof Error ? error.message : (isEs ? 'Lo sentimos, hubo un error al enviar tu mensaje. Inténtalo de nuevo.' : 'Sorry, there was an error sending your message. Please try again.');
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
