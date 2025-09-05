@@ -467,10 +467,11 @@ export default function Contacts() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-white/10 border-2 border-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-white/20 hover:border-white/50"
+                      disabled={isSubmitting}
+                      className="w-full bg-white/10 border-2 border-white/30 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:bg-white/20 hover:border-white/50 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <Send className="w-4 h-4 mr-2" />
-                      {t.sendButton}
+                      {isSubmitting ? (isEs ? 'Enviando...' : 'Sending...') : t.sendButton}
                     </Button>
                   </form>
                 </CardContent>
