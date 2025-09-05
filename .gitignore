@@ -1,0 +1,9 @@
+# Node / React
+node_modules/
+dist/
+build/
+.cache/
+.env
+.env.*
+npm-debug.log*
+yarn-error.log*
