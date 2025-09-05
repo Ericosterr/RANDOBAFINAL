@@ -9,7 +9,13 @@
   # Directory for serverless functions
   directory = "netlify/functions"
 
-# Redirect rules for SPA routing
+# API: proxy all /api/* requests to the Express app running inside the Netlify function "api"
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api"
+  status = 200
+
+# SPA routing fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
