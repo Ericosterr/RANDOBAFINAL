@@ -2,41 +2,48 @@ import type { RequestHandler } from "express";
 import axios from "axios";
 
 export const handleBitrixContact: RequestHandler = async (req, res) => {
-  const BITRIX_WEBHOOK_URL = process.env.BITRIX_WEBHOOK_URL;
-  if (!BITRIX_WEBHOOK_URL) {
-    return res.status(500).json({ error: "Missing BITRIX_WEBHOOK_URL server env" });
+  const raw = process.env.BITRIX_WEBHOOK_URL;
+  if (!raw) {
+    return res.status(500).json({ error: { message: "Missing BITRIX_WEBHOOK_URL server env" } });
   }
+
+  const base = raw.endsWith("/") ? raw : `${raw}/`;
 
   try {
     const { name, email, phone, subject, message, source } = req.body ?? {};
 
     const payload = {
       fields: {
-        TITLE: subject || "Website Contact - Courses",
+        TITLE: subject || "Website Contact",
         NAME: name || "",
         PHONE: phone ? [{ VALUE: String(phone), VALUE_TYPE: "WORK" }] : [],
         EMAIL: email ? [{ VALUE: String(email), VALUE_TYPE: "WORK" }] : [],
         COMMENTS: message || "",
         SOURCE_ID: "WEB",
-        UTM_SOURCE: source || "courses",
+        UTM_SOURCE: source || "website",
+        OPENED: "Y",
       },
       params: { REGISTER_SONET_EVENT: "Y" },
     };
 
-    const url = `${BITRIX_WEBHOOK_URL}crm.lead.add.json`;
+    const url = `${base}crm.lead.add.json`;
     const response = await axios.post(url, payload, {
       headers: { "Content-Type": "application/json" },
       timeout: 15000,
     });
 
-    if (response.data && response.data.result) {
-      return res.json({ ok: true, leadId: response.data.result });
+    const data = response.data;
+    if (data && data.result) {
+      return res.json({ ok: true, leadId: data.result });
     }
 
-    return res.status(400).json({ ok: false, data: response.data });
+    // Normalized error shape from Bitrix response
+    const messageOut = data?.error_description || data?.error?.description || "Unknown Bitrix error";
+    return res.status(400).json({ ok: false, error: { message: messageOut }, raw: data });
   } catch (err: any) {
     const status = err?.response?.status || 500;
-    const data = err?.response?.data || { message: err?.message || "Unknown error" };
-    return res.status(status).json({ error: data });
+    const data = err?.response?.data;
+    const messageOut = data?.error_description || data?.error?.description || err?.message || "Unknown error";
+    return res.status(status).json({ error: { message: messageOut }, raw: data });
   }
 };
