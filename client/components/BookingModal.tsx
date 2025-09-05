@@ -118,7 +118,8 @@ export function BookingModal({ isOpen, onClose, item }: BookingModalProps) {
         handleClose();
       }, 3000);
     } catch (error) {
-      toast.error("Failed to submit contact form. Please try again.");
+      const msg = error instanceof Error ? error.message : "Failed to submit contact form. Please try again.";
+      toast.error(msg);
     } finally {
       setIsProcessing(false);
     }
