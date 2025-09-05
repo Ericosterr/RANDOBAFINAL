@@ -77,10 +77,38 @@ export default function Contacts() {
 
   const mapSrc = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3221.7!2d-5.1463!3d36.4273!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0dbf4b8b6b4b7b%3A0x4b7b8b6b4b8b6b4b!2sAv.%20la%20Uni%C3%B3n%2C%2048%2C%2029680%20Estepona%2C%20M%C3%A1laga%2C%20Spain!5e0!3m2!1sen!2sus!4v1706123456789!5m2!1sen!2sus&hl=${isEs ? 'es' : 'en'}`;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Contact form submitted:", formData);
-    // Handle form submission here
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      alert(isEs ? 'Por favor, completa todos los campos obligatorios' : 'Please fill in all required fields');
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const resp = await fetch('/api/bitrix/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          source: 'contact-page',
+        }),
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        const message = (data as any)?.error?.message || 'Request failed';
+        throw new Error(message);
+      }
+      alert(isEs ? '¡Gracias! Tu mensaje se ha enviado correctamente.' : 'Thank you! Your message has been sent successfully.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (err: any) {
+      const msg = err?.message || (isEs ? 'Error al enviar el formulario' : 'Failed to submit form');
+      alert(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Custom phone icon component
