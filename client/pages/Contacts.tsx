@@ -19,6 +19,7 @@ export default function Contacts() {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { language } = useLanguage();
   const isEs = language === "es";
 
