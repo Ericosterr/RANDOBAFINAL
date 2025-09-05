@@ -56,10 +56,10 @@ export default function Contacts() {
         sendMessageTitle: "Send us a Message",
         formIntro: "Fill out the form below and we'll get back to you as soon as possible.",
         labels: {
-          name: "{t.labels.name}",
-          email: "{t.labels.email}",
-          subject: "{t.labels.subject}",
-          message: "{t.labels.message}",
+          name: "Name *",
+          email: "Email *",
+          subject: "Subject *",
+          message: "Message *",
         },
         placeholders: {
           name: "Your full name",
